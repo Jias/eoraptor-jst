@@ -24,9 +24,26 @@ module.exports = function(grunt) {
     },
 
     eoraptor_jst: {
-      default_options: {
+      amd: {
         options: {
+          module: 'amd'
           // namespace:'tpl'
+        },
+        files: {
+          'tmp/jst.amd.js': ['tmp/*.tpl.js'],
+        },
+      },
+      cmd: {
+        options: {
+          module: 'cmd'
+          // namespace:'tpl'
+        },
+        files: {
+          'tmp/jst.cmd.js': ['tmp/*.tpl.js'],
+        },
+      },
+      normal: {
+        options: {
         },
         files: {
           'tmp/jst.js': ['tmp/*.tpl.js'],

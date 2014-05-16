@@ -52,14 +52,29 @@ Type: `Function` Default value:
 This option accepts a function which takes one argument (the template filepath) and returns a string which will be used as the key for the precompiled template object. By default, it's a file's name without the path and external parts.
 
 
-#### amd
-Type: `Boolean` Default: `false`
+#### module
+Type: `Boolean` Default: `false` Available Value: `false`, `amd`, `cmd`
 
 Wraps the output file with an AMD define function and returns the compiled template namespace unless namespace has been explicitly set to false in which case the template function will be returned directly.
 
+when module is `false`(default)
+
+    (function() {
+      //...
+    })();
+
+when module is `amd`
+
     define(function() {
       //...
-      return this['[template namespace]'];
+      return namespace;
+    });
+
+when module is `cmd`
+
+    define(function(require, exports, module) {
+      //...
+      module.exports = namespace;
     });
 
 ### Usage Examples
@@ -69,7 +84,7 @@ Wraps the output file with an AMD define function and returns the compiled templ
       eoraptor_jst: {
         foo: {
           options: {
-            "amd": true
+            "module": "amd"
           },
           files: {
             "path/to/compiled.js": ["path/to/templates/*.tpl.js"]
@@ -81,4 +96,5 @@ Wraps the output file with an AMD define function and returns the compiled templ
 
 ## Release History
 
-* 2012-08-10   v0.1.0   initial version.
+* 2014-05-13   v0.1.2   add `cmd` support.
+* 2013-08-10   v0.1.0   initial version.

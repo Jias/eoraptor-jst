@@ -1,4 +1,4 @@
-(function(){
+define(function () {
 
 this["eoraptor"] = this["eoraptor"] || {};
 
@@ -36,4 +36,6 @@ if(d_.success){r_.push("success");
 return r_.join("");
 };
 
-})();
+return this["eoraptor"];
+
+});

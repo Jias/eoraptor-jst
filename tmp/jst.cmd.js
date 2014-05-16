@@ -1,4 +1,5 @@
-(function(){
+define(function (require, exports, module) {
+var __ = require("eoraptor")._;
 
 this["eoraptor"] = this["eoraptor"] || {};
 
@@ -36,4 +37,6 @@ if(d_.success){r_.push("success");
 return r_.join("");
 };
 
-})();
+module.exports = this["eoraptor"];
+
+});

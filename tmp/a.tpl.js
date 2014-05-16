@@ -1,5 +1,5 @@
 <ul>
-    {{#this.features item key}}
-        <li>{{key}}:{{item}}</li>
+    {{#list item key}}
+        <li>{{= &item.name}}</li>
     {{/}}
 </ul>

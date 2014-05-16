@@ -9,7 +9,7 @@
 'use strict';
 module.exports = function(grunt) {
 
-  var eoraptor = require('eoraptor.js');
+  var eoraptor = require('eoraptorjs');
 
   // 
   var createNamespace = function(ns) {
@@ -36,10 +36,6 @@ module.exports = function(grunt) {
 
   grunt.registerMultiTask('eoraptor_jst', 'Compile eoraptor templates to JST file', function() {
     var lf = grunt.util.linefeed;
-    // filename conversion for templates
-    var processName = function(filepath) {
-      return filepath.match(/([^\/]+)\.tpl.js$/)[1];
-    };
     // Merge task-specific and/or target-specific options with these defaults.
     var options = this.options({
       namespace: 'eoraptor',
@@ -48,10 +44,17 @@ module.exports = function(grunt) {
       processContent: function(src) {
         return src.replace(/(^\s+|\s+$)/gm, '').replace(/[\r\n]/gm, '');
       },
-      amd: false,
-      separator: lf + lf
+      // false/amd/cmd
+      module: false,
+      separator: lf + lf,
+      ext: 'tpl.js',
+      standalone: true
     });
 
+    // filename conversion for templates
+    function processName (filepath) {
+      return filepath.match(new RegExp('([^\/]+)\.'+options.ext+'$'))[1];
+    };
 
 
     var ns = createNamespace(options.namespace);
@@ -76,16 +79,29 @@ module.exports = function(grunt) {
         return 'ns[' + JSON.stringify(tplName) + '] = '+compiled+';';
       });
 
-      output.unshift('var ns='+ns.namespace+', e__ = eoraptor.escape;');
+      output.unshift('var ns='+ns.namespace+', e_=__.e, v_=__.v;\n');
       
       // add namespace declaration
       output.unshift(ns.declaration);
 
-      output.unshift(options.amd ? 'define(function () {' : '(function(){');
+      if (options.standalone) {
+        output.unshift(grunt.file.read('node_modules/eoraptor-jst/tasks/eoraptor.runtime.js'));
+      }
 
-      options.amd && options.namespace && output.push('return '+ns.namespace+';');
+      if (options.module === 'amd') {
+        output.unshift('define(function () {');
+        options.namespace && output.push('return '+ns.namespace+';');
+      } else if (options.module === 'cmd') {
+        if (!options.standalone) {
+          output.unshift('var __ = require("eoraptor")._;');
+        }
+        output.unshift('define(function (require, exports, module) {\n');
+        options.namespace && output.push('module.exports = '+ns.namespace+';');
+      } else {
+        output.unshift('(function(){');
+      }
 
-      output.push(options.amd ? '});' : '})();');
+      output.push(options.module ? '});' : '})();');
 
       output = output.join(grunt.util.normalizelf(options.separator));
 
